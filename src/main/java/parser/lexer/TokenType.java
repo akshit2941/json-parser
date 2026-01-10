@@ -1,4 +1,4 @@
-package java.parser.lexer;
+package parser.lexer;
 
 public enum TokenType {
     LEFT_BRACE,     // {

@@ -1,4 +1,4 @@
-package java.parser.lexer;
+package parser.lexer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,10 +160,21 @@ public class Lexer {
     }
 
     private Token readBoolean() {
-        return null;
+        if(startsWith("true")){
+            position+=4;
+            return new Token(TokenType.BOOLEAN, "true");
+        } else if (startsWith("false")) {
+            position+=4;
+            return new Token(TokenType.BOOLEAN, "false");
+        }
+        throw new RuntimeException("Invalid Boolean value");
     }
 
     private Token readNull() {
-        return null;
+        if(startsWith("null")){
+            position+=4;
+            return new Token(TokenType.NULL, "null");
+        }
+        throw new RuntimeException("Invalid null value");
     }
 }
