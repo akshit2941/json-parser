@@ -87,7 +87,7 @@ public class Lexer {
 
         StringBuilder value = new StringBuilder();
 
-        while(!isAtEnd()) {
+        while (!isAtEnd()) {
             char current = advance();
 
             if (current == '"') {
@@ -136,7 +136,27 @@ public class Lexer {
     }
 
     private Token readNumber() {
-        return null;
+        StringBuilder value = new StringBuilder();
+
+        if (peek() == '-') {
+            value.append(advance());
+        }
+
+        while (!isAtEnd() && Character.isDigit(peek())) {
+            value.append(advance());
+        }
+        if (!isAtEnd() && peek() == '.') {
+            value.append(advance());
+
+            if (isAtEnd() || !Character.isDigit(peek())) {
+                throw new RuntimeException("Invalid formate");
+            }
+
+            while (!isAtEnd() && Character.isDigit(peek())) {
+                value.append(advance());
+            }
+        }
+        return new Token(TokenType.NUMBER, value.toString());
     }
 
     private Token readBoolean() {
