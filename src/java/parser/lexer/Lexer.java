@@ -11,18 +11,18 @@ public class Lexer {
         this.input = input;
     }
 
-    public List<Token> tokenize(){
-        List<Token> tokens =new ArrayList<>();
+    public List<Token> tokenize() {
+        List<Token> tokens = new ArrayList<>();
 
-        while (!isAtEnd()){
-            char current =  input.charAt(position);
+        while (!isAtEnd()) {
+            char current = input.charAt(position);
 
-            if(Character.isWhitespace(current)){
-               advance();
+            if (Character.isWhitespace(current)) {
+                advance();
                 continue;
             }
 
-            switch(current){
+            switch (current) {
                 case '{':
                     tokens.add(new Token(TokenType.LEFT_BRACE, "{"));
                     advance();
@@ -51,14 +51,14 @@ public class Lexer {
                     tokens.add(readString());
                     break;
                 default:
-                    if(Character.isDigit(current) || (current == '-')){
+                    if (Character.isDigit(current) || (current == '-')) {
                         tokens.add(readNumber());
                     } else if (startsWith("true") || startsWith("false")) {
                         tokens.add(readBoolean());
                     } else if (startsWith("null")) {
                         tokens.add(readNull());
-                    }else{
-                        throw new RuntimeException("Unexpected Char:"+current);
+                    } else {
+                        throw new RuntimeException("Unexpected Char:" + current);
                     }
             }
         }
@@ -82,8 +82,68 @@ public class Lexer {
         return input.startsWith(value, position);
     }
 
-    private Token readString() { return null; }
-    private Token readNumber() { return null; }
-    private Token readBoolean() { return null; }
-    private Token readNull() { return null; }
+    private Token readString() {
+        advance();
+
+        StringBuilder value = new StringBuilder();
+
+        while(!isAtEnd()) {
+            char current = advance();
+
+            if (current == '"') {
+                return new Token(TokenType.STRING, value.toString());
+            }
+
+            if (current == '\\') {
+                if (!isAtEnd()) {
+                    throw new RuntimeException("Unterminated escape squence");
+                }
+
+                char escaped = advance();
+                switch (escaped) {
+                    case '"':
+                        value.append('"');
+                        break;
+                    case '\\':
+                        value.append('\\');
+                        break;
+                    case '/':
+                        value.append('/');
+                        break;
+                    case 'b':
+                        value.append('\b');
+                        break;
+                    case 'f':
+                        value.append('\f');
+                        break;
+                    case 'n':
+                        value.append('\n');
+                        break;
+                    case 'r':
+                        value.append('\r');
+                        break;
+                    case 't':
+                        value.append('\t');
+                        break;
+                    default:
+                        throw new RuntimeException("Invalid escape character: \\" + escaped);
+                }
+            } else {
+                value.append(current);
+            }
+        }
+        throw new RuntimeException("Unterminated string literal");
+    }
+
+    private Token readNumber() {
+        return null;
+    }
+
+    private Token readBoolean() {
+        return null;
+    }
+
+    private Token readNull() {
+        return null;
+    }
 }
