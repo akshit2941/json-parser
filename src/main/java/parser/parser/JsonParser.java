@@ -22,7 +22,7 @@ public class JsonParser {
 
     public JsonValue parse(){
         JsonValue value = parseValue();
-        expect(TokenType.EOF, "Unexpected Token");
+        expect(TokenType.EOF, "Unexpected Token after JSON value");
         return value;
     }
 
@@ -44,13 +44,13 @@ public class JsonParser {
     }
 
     private boolean check(TokenType type) {
-        if (isAtEnd()) return false;
+        if (isAtEnd()) return type == TokenType.EOF;
         return peek().type == type;
     }
 
     private Token expect(TokenType type, String errorMessage){
         if(check(type)) return advance();
-        throw new RuntimeException(errorMessage+ " at token: "+peek());
+        throw new RuntimeException(errorMessage+ " at token: "+ peek());
     }
 
     private JsonValue parseValue(){
@@ -116,7 +116,7 @@ public class JsonParser {
         JsonArray array = new JsonArray();
 
         //for ending array at start
-        if(check(TokenType.RIGHT_BRACE)){
+        if(check(TokenType.RIGHT_BRACKET)){
             advance();
             return array;
         }
@@ -131,7 +131,7 @@ public class JsonParser {
             }
             break;
         }
-        expect(TokenType.RIGHT_BRACE, "Expected ']' at end of an array");
+        expect(TokenType.RIGHT_BRACKET, "Expected ']' at end of an array");
         return array;
     }
 }

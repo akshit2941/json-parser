@@ -1,15 +1,20 @@
 import parser.lexer.Token;
 import parser.lexer.Lexer;
+import parser.model.JsonValue;
+import parser.parser.JsonParser;
+
 import java.util.List;
 
 public class Main  {
     public static void main(String[] args) {
-        String json = "{ \"name\": \"Akshit\", \"age\": 21, \"active\": true, \"skills\": [\"Java\", \"C++\"] }";
+        String json = "{ \"name\": \"TestApp\", \"version\": 1, \"active\": true }";
 
         Lexer lexer = new Lexer(json);
         List<Token> tokens = lexer.tokenize();
-        for (Token token: tokens){
-            System.out.println(token);
-        }
+
+        JsonParser parser = new JsonParser(tokens);
+        JsonValue value = parser.parse();
+
+        System.out.println(value);
     }
 }
