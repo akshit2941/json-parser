@@ -58,13 +58,26 @@ public class Lexer {
                     } else if (startsWith("null")) {
                         tokens.add(readNull());
                     } else {
-                        throw new RuntimeException("Unexpected Char:" + current);
+                        error(current);
                     }
             }
         }
         tokens.add(new Token(TokenType.EOF, ""));
         return tokens;
     }
+
+    private void error(char ch) {
+        int start = Math.max(0, position - 10);
+        int end = Math.min(input.length(), position + 10);
+
+        String context = input.substring(start, end);
+
+        throw new RuntimeException(
+                "Unexpected character '" + ch + "' at position " + position +
+                        "\nContext: \"" + context + "\""
+        );
+    }
+
 
     private boolean isAtEnd() {
         return position >= input.length();
@@ -88,48 +101,27 @@ public class Lexer {
         StringBuilder value = new StringBuilder();
 
         while (!isAtEnd()) {
-            char current = advance();
+            char current = peek();
 
             if (current == '"') {
+                advance();
                 return new Token(TokenType.STRING, value.toString());
             }
 
             if (current == '\\') {
-                if (!isAtEnd()) {
-                    throw new RuntimeException("Unterminated escape squence");
-                }
-
-                char escaped = advance();
-                switch (escaped) {
-                    case '"':
-                        value.append('"');
-                        break;
-                    case '\\':
-                        value.append('\\');
-                        break;
-                    case '/':
-                        value.append('/');
-                        break;
-                    case 'b':
-                        value.append('\b');
-                        break;
-                    case 'f':
-                        value.append('\f');
-                        break;
-                    case 'n':
-                        value.append('\n');
-                        break;
-                    case 'r':
-                        value.append('\r');
-                        break;
-                    case 't':
-                        value.append('\t');
-                        break;
+                advance(); // consume '\'
+                char esc = advance();
+                switch (esc) {
+                    case '"': value.append('"'); break;
+                    case '\\': value.append('\\'); break;
+                    case 'n': value.append('\n'); break;
+                    case 't': value.append('\t'); break;
+                    case 'r': value.append('\r'); break;
                     default:
-                        throw new RuntimeException("Invalid escape character: \\" + escaped);
+                        throw new RuntimeException("Invalid escape \\" + esc);
                 }
             } else {
-                value.append(current);
+                value.append(advance());
             }
         }
         throw new RuntimeException("Unterminated string literal");
@@ -164,7 +156,7 @@ public class Lexer {
             position+=4;
             return new Token(TokenType.BOOLEAN, "true");
         } else if (startsWith("false")) {
-            position+=4;
+            position+=5;
             return new Token(TokenType.BOOLEAN, "false");
         }
         throw new RuntimeException("Invalid Boolean value");

@@ -1,14 +1,114 @@
-{ "name"   : "John Smith",
-  "sku"    : "20223",
-  "price"  : 23.95,
-  "shipTo" : { "name" : "Jane Smith",
-    "address" : "123 Maple Street",
-    "city" : "Pretendville",
-    "state" : "NY",
-    "zip"   : "12345" },
-  "billTo" : { "name" : "John Smith",
-    "address" : "123 Maple Street",
-    "city" : "Pretendville",
-    "state" : "NY",
-    "zip"   : "12345" }
+{
+  "application": {
+    "name": "SamplePlatform",
+    "version": "1.4.2",
+    "environment": "production",
+    "features": {
+      "authentication": true,
+      "logging": true,
+      "analytics": false,
+      "multiTenant": true
+    }
+  },
+  "server": {
+    "host": "localhost",
+    "port": 8080,
+    "ssl": {
+      "enabled": false,
+      "certificate": null
+    },
+    "timeouts": {
+      "connection": 5000,
+      "read": 10000,
+      "write": 10000
+    }
+  },
+  "database": {
+    "type": "postgresql",
+    "replication": {
+      "enabled": true,
+      "replicas": [
+        {
+          "host": "db-replica-1",
+          "port": 5432,
+          "priority": 1
+        },
+        {
+          "host": "db-replica-2",
+          "port": 5432,
+          "priority": 2
+        }
+      ]
+    },
+    "credentials": {
+      "username": "service_user",
+      "password": "********"
+    },
+    "pool": {
+      "minConnections": 5,
+      "maxConnections": 50,
+      "idleTimeout": 30000
+    }
+  },
+  "services": [
+    {
+      "name": "user-service",
+      "enabled": true,
+      "endpoints": [
+        {
+          "method": "GET",
+          "path": "/users",
+          "secured": true
+        },
+        {
+          "method": "POST",
+          "path": "/users",
+          "secured": true
+        }
+      ]
+    },
+    {
+      "name": "notification-service",
+      "enabled": false,
+      "endpoints": []
+    }
+  ],
+  "cache": {
+    "provider": "redis",
+    "nodes": [
+      {
+        "host": "cache-1",
+        "port": 6379
+      },
+      {
+        "host": "cache-2",
+        "port": 6379
+      }
+    ],
+    "settings": {
+      "ttlSeconds": 3600,
+      "evictionPolicy": "LRU"
+    }
+  },
+  "scheduler": {
+    "enabled": true,
+    "jobs": [
+      {
+        "name": "cleanup-job",
+        "cron": "0 0 * * *",
+        "active": true
+      },
+      {
+        "name": "report-job",
+        "cron": "0 */6 * * *",
+        "active": false
+      }
+    ]
+  },
+  "metadata": {
+    "createdAt": "2025-01-01T00:00:00Z",
+    "updatedAt": "2025-06-01T12:30:00Z",
+    "tags": ["backend", "json", "parser", "test"],
+    "notes": null
+  }
 }
